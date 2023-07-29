@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Photo Carousel</title>
+    <style>
+        /* This is the box that shows the large image */
+        #slideshow {
+            /* Style to taste */
+	    /* Changed width from 100% to 120% to move image to the right */	
+            width: 120%;
+            /* 75% is for a 4:3 aspect ratio, use 56.25% for 16:9 */
+            padding-bottom: 75%;
+            border: solid 1px black;
+            border-radius: 4px;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #1e1e1e;
+            position: relative;
+            transition: 0.5s;
+            position: relative;
+        }
+
+        /* This is for the left and right scrolling arrows */
+        #slideshow img {
+            position: absolute;
+            height: 80px;
+            opacity: .5;
+        }
+
+        /* Left scrolling arrow */
+        #slideshow img.left {
+            left: 8px;
+        }
+
+        /* Right scrolling arrow */
+        #slideshow img.right {
+            right: 8px;
+        }
+
+        /* Small clickable thumbnail pictures at the bottom */
+        #filmstrip {
+            height: 62px;
+            width: 80%;
+            margin: 0.5em auto;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: flex-end;
+            align-items: center;
+            overflow: hidden;
+            overflow-x: scroll;
+        }
+
+        /* Each small thumbnail image */
+        #filmstrip img {
+            display: flex;
+            height: 88%;
+            margin-right: 8px;
+        }
+
+        /* Highlight for thumbnail image that represents the large picture that's showing */
+        .bordered {
+            box-shadow: 0 0 4px 4px purple;
+        }
+
+        /* Wide screen */
+        @media screen and (min-width: 500px) {
+            #container {
+                width: 60%;
+                margin: 1em auto;
+            }
+            #slideshow img {
+                top: 45%;
+            }
+        }
+
+        /* Narrow screen */
+        @media screen and (max-width: 499px) {
+            #container {
+                width: 90%;
+                margin: 0 auto;
+            }
+            #slideshow img {
+                top: 30%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <!-- Large image with scrolling arrows-->
+        <div id="slideshow">
+            <img src="left.png" class="left" alt="left" title="left" onclick="slide(-1)">
+            <img src="right.png" class="right" alt="right" title="right" onclick="slide(1)">
+        </div>
+        <!-- Small thumbnail images -->
+        <div id="filmstrip"></div>
+    </div>
+
+    <!-- Put this code near the bottom of the page, just before the closing /body tag -->
+    <script>
+        //For this to work, images must be named img01.jpg, img02.jpg, img03.jpg...img10.jpg, img11.jpg
+        //with no breaks in the sequence. And number_of_image has to be accurate indicating the highest
+        //number.  The images folder must be a child folder to the folder that contains the page with this code.
+        var number_of_images = 30;
+        var images_folder = 'filmstrip';
+        var thisimage = '';
+        // Creates the thumbnail images inside filmstrip.
+        for (i = 1; i <= number_of_images; i++) {
+            thisimage = images_folder + '/img' + ('0' + i.toString()).slice(-2) + ".jpg";
+            document.getElementById('slideshow').style.backgroundImage = "url('" + thisimage; + "')";
+            document.getElementById('filmstrip').innerHTML += "<img src='" + thisimage + "' onclick='show(" + i + ")'>"
+            //Go to first image
+            show(1);
+        }
+        //Calls the show function when a left or right scrolling arrow is clicked.
+        function slide(x) {
+            //Determing the number of the image currently showing (before they clicked a scroll arrow)
+            var currentimage = document.getElementById('slideshow').style.backgroundImage.split('.jpg');
+            var i = parseInt(currentimage[0].slice(-2)) + x;
+            //If they tried to scroll past the last image, loop around to the first.
+            i = i > number_of_images ? 1 : i;
+            //If they tried to scroll past the first image, loop around to the last.
+            i = i < 1 ? number_of_images : i;
+            show(i);
+        }
+        //Show the image (the i indicates the XX in the imgXX.jpg file name.)
+        function show(i) {
+            thisimage = images_folder + '/img' + ('0' + i.toString()).slice(-2) + ".jpg";
+            document.getElementById('slideshow').style.backgroundImage = "url('" + thisimage; + "')"
+            //Loop through thumbnail images, border only the current one.
+            var filmstrip = document.getElementById("filmstrip");
+            var thumbs = filmstrip.getElementsByTagName("img");
+            for (x = 0; x < thumbs.length; x++) {
+                if (x == i - 1) {
+                    thumbs[x].className = 'bordered';
+                } else {
+                    thumbs[x].className = '';
+                }
+            }
+            //Decide which third of the thumbnails to show based on position of current pic.
+            filmstrip.style.justifyContent = 'center';
+            if (i <= number_of_images / 3) {
+                filmstrip.style.justifyContent = 'flex-start';
+            }
+            if (i >= number_of_images - (number_of_images / 3)) {
+                filmstrip.style.justifyContent = 'flex-end';
+            }
+        }
+    </script>
+</body>
+</html> 
